@@ -1,19 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Student</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Edit Student</h1>
-        <form method="POST">
-            <input type="text" name="name" value="{{ student.name }}" required>
-            <input type="number" name="age" value="{{ student.age }}" required>
-            <input type="text" name="grade" value="{{ student.grade }}" required>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </form>
-    </div>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Edit Student</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container mt-5">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
+                <h2>Edit Student</h2>
+                <div>
+                    <a href="/" class="btn btn-secondary btn-sm align-items-center">Back</a>
+                </div>
+            </div>
+
+            <form method="POST" class="mt-4">
+
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" class="form-control" value="{{ student.age }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Grade</label>
+                    <input type="text" name="grade" class="form-control" value="{{ student.grade }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Student</button>
+            </form>
+
+        </div>
+    </body>
 </html>

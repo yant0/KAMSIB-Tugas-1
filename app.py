@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from functools import wraps 
 from sqlalchemy import text
-import sqlite3
-
+from functools import wraps                  # DITAMBAHKAN
+from werkzeug.security import generate_password_hash, check_password_hash   # DITAMBAHKAN
+# import os
+# import sqlite3
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = " secret123"    	# DITAMBAHKAN
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -19,13 +21,60 @@ class Student(db.Model):
     def __repr__(self):
         return f'<Student {self.name}>'
 
+class User(db.Model):                     	# DITAMBAHKAN
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+def login_required(f):                 	# DITAMBAHKAN
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user_id" not in session:   	# DITAMBAHKAN
+            flash("Silakan login dahulu.", "warning")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route('/')
+@login_required 
 def index():
     # RAW Query
     students = db.session.execute(text('SELECT * FROM student')).fetchall()
     return render_template('index.html', students=students)
 
+@app.route("/register", methods=["GET", "POST"])    # DITAMBAHKAN
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = generate_password_hash(request.form["password"])   # DITAMBAHKAN
+        new_user = User(username=username, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash("Registrasi berhasil!", "success")
+        return redirect(url_for("login"))
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])    # DITAMBAHKAN
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):   # DITAMBAHKAN
+            session["user_id"] = user.id    	# DITAMBAHKAN
+            session["username"] = user.username # DITAMBAHKAN
+            return redirect(url_for("index"))
+        flash("Username atau password salah.", "danger")
+    return render_template("login.html")
+
+
+@app.route("/logout")                 	# DITAMBAHKAN
+def logout():
+    session.clear()                   	# DITAMBAHKAN
+    return redirect(url_for("login"))
+
 @app.route('/add', methods=['POST'])
+@login_required 
 def add_student():
     name = request.form['name']
     age = request.form['age']
@@ -40,6 +89,7 @@ def add_student():
 
 
 @app.route('/delete/<int:id>') 
+@login_required 
 def delete_student(id):
     # RAW Query
     # db.session.execute(text(f"DELETE FROM student WHERE id={id}"))
@@ -50,6 +100,7 @@ def delete_student(id):
 
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required 
 def edit_student(id):
     if request.method == 'POST':
         name = request.form['name']

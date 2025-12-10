@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            height: 100vh;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .card {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-aesthetic {
+            background: #ff9ecd;
+            border: none;
+            color: white;
+            font-weight: 500;
+            border-radius: 10px;
+        }
+
+        .btn-aesthetic:hover {
+            background: #ff7eb8;
+        }
+
+        a {
+            color: #6d4baa;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container d-flex justify-content-center align-items-center" style="height:100vh;">
+        <div class="card shadow">
+
+            <h3 class="text-center mb-4" style="color:#6d4baa;">Welcome Back 💜</h3>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} text-center">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label" style="color:#4a3b75;">Username</label>
+                    <input type="text" class="form-control" name="username" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" style="color:#4a3b75;">Password</label>
+                    <input type="password" class="form-control" name="password" required>
+                </div>
+
+                <button class="btn btn-aesthetic w-100 mt-2">Login</button>
+            </form>
+
+            <p class="text-center mt-3" style="color:#4a3b75;">
+                Belum punya akun?
+                <a href="/register">Register</a>
+            </p>
+
+        </div>
+    </div>
+</body>
+</html>
