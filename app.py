@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from functools import wraps 
 from sqlalchemy import text
 import sqlite3
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
@@ -46,10 +48,12 @@ def add_student():
     return redirect(url_for('index'))
 
 
-@app.route('/delete/<string:id>') 
+@app.route('/delete/<int:id>') 
 def delete_student(id):
     # RAW Query
-    db.session.execute(text(f"DELETE FROM student WHERE id={id}"))
+    # db.session.execute(text(f"DELETE FROM student WHERE id={id}"))
+    # db.session.commit()
+    db.session.execute(text("DELETE FROM student WHERE id=:id"),{'id': id})
     db.session.commit()
     return redirect(url_for('index'))
 
@@ -62,12 +66,15 @@ def edit_student(id):
         grade = request.form['grade']
         
         # RAW Query
-        db.session.execute(text(f"UPDATE student SET name='{name}', age={age}, grade='{grade}' WHERE id={id}"))
+        # db.session.execute(text(f"UPDATE student SET name='{name}', age={age}, grade='{grade}' WHERE id={id}"))
+        db.session.execute(text("UPDATE student SET name=:name, age=:age, grade=:grade WHERE id=:id"),
+        {'name': name, 'age': age, 'grade': grade, 'id': id})
         db.session.commit()
         return redirect(url_for('index'))
     else:
         # RAW Query
         student = db.session.execute(text(f"SELECT * FROM student WHERE id={id}")).fetchone()
+        if not student : return redirect(url_for('index'))
         return render_template('edit.html', student=student)
 
 # if __name__ == '__main__':
