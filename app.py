@@ -30,21 +30,12 @@ def add_student():
     name = request.form['name']
     age = request.form['age']
     grade = request.form['grade']
-    
-
-    connection = sqlite3.connect('instance/students.db')
-    cursor = connection.cursor()
-
     # RAW Query
-    # db.session.execute(
-    #     text("INSERT INTO student (name, age, grade) VALUES (:name, :age, :grade)"),
-    #     {'name': name, 'age': age, 'grade': grade}
-    # )
-    # db.session.commit()
-    query = f"INSERT INTO student (name, age, grade) VALUES ('{name}', {age}, '{grade}')"
-    cursor.execute(query)
-    connection.commit()
-    connection.close()
+    db.session.execute(
+        text("INSERT INTO student (name, age, grade) VALUES (:name, :age, :grade)"),
+        {'name': name, 'age': age, 'grade': grade}
+    )
+    db.session.commit()
     return redirect(url_for('index'))
 
 
